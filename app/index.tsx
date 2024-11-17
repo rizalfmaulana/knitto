@@ -4,9 +4,14 @@ import { StatusBar } from "expo-status-bar";
 import { hp, wp } from "@/lib/utils";
 import { theme } from "@/constants/theme";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
+import { useAppSelector } from "@/hooks/hooks";
 
 const WelcomeScreen = () => {
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  if (isAuthenticated) {
+    return <Redirect href="/home" />;
+  }
   return (
     <View style={styles.container}>
       <Image
@@ -31,7 +36,7 @@ const WelcomeScreen = () => {
           <Animated.View entering={FadeInDown.delay(600).springify()}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => router.push("/home")}
+              onPress={() => router.push("/login")}
             >
               <Text style={styles.buttonText}>Get Started</Text>
             </TouchableOpacity>

@@ -3,10 +3,6 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { bg } from "@/constants/icons";
 
-// const bg = {
-//   bookmark: require("../../assets/images/bookmark.png"),
-//   home: require("../../assets/images/home.png"),
-// };
 const TabIcon = ({ icon, color, name, focused }: any) => {
   return (
     <View
@@ -15,7 +11,7 @@ const TabIcon = ({ icon, color, name, focused }: any) => {
         alignItems: "center",
         gap: 2,
         width: 96,
-        marginTop: 28,
+        marginTop: 20,
       }}
     >
       <Image
