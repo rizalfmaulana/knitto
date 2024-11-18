@@ -2,6 +2,10 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+## Project Screenshots
+
+![App preview](./assets/images/pixabay.png)
+
 ## Features
 
 Here some of the project's features:
