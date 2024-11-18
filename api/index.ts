@@ -2,8 +2,11 @@ import axios from "axios";
 
 const API_KEY = "47110492-9fd8e97bcb9649c6f535f60ac";
 const API_URL = `https://pixabay.com/api/?key=${API_KEY}`;
-
-const formatUrl = (params) => {
+type ParamsType = {
+  page: number;
+  q?: string;
+};
+const formatUrl = (params: any) => {
   let url = API_URL + "&per_page=25&safesearch=true&editors_choice=true";
   if (!params) return url;
 
@@ -15,7 +18,7 @@ const formatUrl = (params) => {
 
   return url;
 };
-export const apiCall = async (params) => {
+export const apiCall = async (params: ParamsType) => {
   try {
     const response = await axios.get(formatUrl(params));
     return response.data;

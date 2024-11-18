@@ -1,5 +1,5 @@
 import { loginUser } from "@/services/authApi";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export const authSlice = createSlice({
   name: "auth",
@@ -16,6 +16,12 @@ export const authSlice = createSlice({
     logout: (state) => {
       state.isAuthenticated = false;
     },
+    authReset: (state) => {
+      state.isAuthenticated = false;
+      state.authLoading = false;
+      state.token = "";
+      state.error = "";
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -25,20 +31,16 @@ export const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, { payload }) => {
         state.authLoading = false;
         state.isAuthenticated = true;
-        // state.token = payload;
+        state.token = payload.key;
       })
-      .addCase(loginUser.rejected, (state, { payload }) => {
+      .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
         state.authLoading = false;
         state.isAuthenticated = false;
-        // state.error = payload;
+        state.error = action.payload;
       });
   },
 });
 
-export const { login, logout } = authSlice.actions;
-
-// Other code such as selectors can use the imported `RootState` type
-
-// export const selectAuth = (state: RootState) => state.auth.isAuthenticated;
+export const { login, logout, authReset } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -10,12 +10,17 @@ const config = {
 /*
 for ip address user your metro ip address
 **/
+type Form = {
+  username: string;
+  password: string;
+};
+type error = string;
 
 export const loginUser = createAsyncThunk(
   "/api/login",
-  async (userData, thunkApi) => {
+  async (userData: Form, thunkApi) => {
     try {
-      const data = await axios.post(
+      const { data } = await axios.post(
         "http://192.168.1.5:8081/api/login",
         userData,
         config
@@ -23,8 +28,7 @@ export const loginUser = createAsyncThunk(
 
       return data;
     } catch (error: any) {
-      console.log(error);
-      return thunkApi.rejectWithValue(error.response.data.message);
+      return thunkApi.rejectWithValue(error.response.data as error);
     }
   }
 );

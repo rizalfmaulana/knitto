@@ -23,13 +23,7 @@ type Props = {
 
 const ImageCard = ({ item, index, column }: Props) => {
   const isLastRow = (index + 1) % column === 0;
-  const getImageHeight = () => {
-    let { imageHeight: height, imageWidth: width } = item;
 
-    return {
-      height: getImageSize(height, width),
-    };
-  };
   const bookmark = useAppSelector((state) => state.bookmark.bookmark);
   const pathname = usePathname();
   const dispatch = useAppDispatch();

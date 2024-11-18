@@ -16,16 +16,33 @@ import { theme } from "@/constants/theme";
 import { apiCall } from "@/api";
 import ImageGrid from "@/components/imageGrid";
 import { debounce } from "lodash";
+import { useGetImagesQuery } from "@/services/imageApi";
+import { useAppSelector } from "@/hooks/hooks";
+import { router } from "expo-router";
+import { ImageType } from "@/types/data";
 
 let page = 1;
+type ParamsType = {
+  page: number;
+  q?: string;
+};
 const HomePage = () => {
   const [search, setSearch] = useState("");
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<ImageType[]>([]);
   const [isEndReached, setIsEndReached] = useState(false);
-  const searchInputRef = useRef();
-  const scrollRef = useRef();
+  const [newPage, setNewPage] = useState(1);
+  const searchInputRef = useRef<TextInput>();
+  const scrollRef = useRef<ScrollView>();
+  const { token, isAuthenticated } = useAppSelector((state) => state.auth);
 
-  const fetchImages = async (params = { page: 1 }, append = true) => {
+  // I haven't succeeded to infinit scroll using rtk query. the problem is that it doesn't fetch the next page.
+  // const { data } = useGetImagesQuery({ key: token, search, page: newPage });
+  // console.log()
+
+  const fetchImages = async (
+    params: ParamsType = { page: 1 },
+    append = true
+  ) => {
     const res = await apiCall(params);
     if (res && res.hits.length > 0) {
       if (append) {
@@ -40,9 +57,13 @@ const HomePage = () => {
     fetchImages();
   }, []);
 
-  // gambar nama user tags
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isAuthenticated]);
 
-  const handleScroll = (event) => {
+  const handleScroll = (event: any) => {
     const contentHeight = event.nativeEvent.contentSize.height;
     const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
     const scrollOffset = event.nativeEvent.contentOffset.y;
@@ -52,9 +73,10 @@ const HomePage = () => {
       if (!isEndReached) {
         setIsEndReached(true);
         ++page;
-        let params = {
+        let params: ParamsType = {
           page,
         };
+        setNewPage((prev) => prev + 1);
         if (search) {
           params.q = search;
         }
@@ -72,7 +94,7 @@ const HomePage = () => {
       fetchImages({ page: 1, q: value });
     } else {
       setImages([]);
-      searchInputRef?.current.clear();
+      searchInputRef?.current?.clear();
       fetchImages({ page: 1 });
     }
   };
@@ -96,7 +118,7 @@ const HomePage = () => {
         contentContainerStyle={{ gap: 10 }}
         onScroll={handleScroll}
         scrollEventThrottle={5}
-        ref={scrollRef}
+        ref={scrollRef as any}
       >
         {/* search bar */}
         <View style={styles.searchBar}>
@@ -107,8 +129,7 @@ const HomePage = () => {
             style={styles.searchInput}
             placeholder="Search photos"
             placeholderTextColor="gray"
-            ref={searchInputRef}
-            // value={search}
+            ref={searchInputRef as any}
             onChangeText={handleTextDebounce}
           />
           {search && (

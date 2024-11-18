@@ -1,12 +1,12 @@
 import { View, Text, Image, Alert, ScrollView, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButon from "@/components/CustomButton";
 import FormField from "@/components/FormField";
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
-import { login } from "@/features/auth/authSlice";
-import { Redirect } from "expo-router";
+import { authReset, login } from "@/features/auth/authSlice";
+import { Redirect, router } from "expo-router";
 import { loginUser } from "@/services/authApi";
 
 const Login = () => {
@@ -15,23 +15,18 @@ const Login = () => {
     password: "",
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const { isAuthenticated, error, authLoading } = useAppSelector(
+    (state) => state.auth
+  );
 
   const dispatch = useAppDispatch();
-  // const { data } = useGetUserQuery();
-  // console.log(data);
-
-  if (isAuthenticated) {
-    return <Redirect href="/home" />;
-  }
 
   const handleSubmit = () => {
     if (!form.username || !form.password) {
       Alert.alert("Please fill in all the fields");
       return;
     }
-    // setIsSubmitting(true);
+
     dispatch(loginUser(form));
     // dispatch(signin(form));
     // try {
@@ -55,6 +50,18 @@ const Login = () => {
     //   setIsSubmitting(false);
     // }
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/home");
+    }
+    if (error) {
+      Alert.alert(error);
+      setForm({ username: "", password: "" });
+      dispatch(authReset());
+    }
+  }, [error, isAuthenticated]);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={{ height: "100%" }}>
@@ -82,7 +89,7 @@ const Login = () => {
           <CustomButon
             title="Sign In"
             handlePress={handleSubmit}
-            isLoading={isSubmitting}
+            isLoading={authLoading}
           />
         </View>
       </ScrollView>
